@@ -71,10 +71,12 @@ def hide(msg, img, length):
 	'''
 	msg_bin = strToBin(msg)
 	img_bin = imageToBin(img)
+	letter_list= list()
 	i = -1
 	for letter in msg_bin: #caminha nas letras do texto
-		
-		for bit_letter in list(letter): # caminha nos bits das letras
+		letter_list = list(letter)
+		letter_list.reverse()
+		for bit_letter in letter_list: # caminha nos bits das letras
 			i += 1
 			if (i+1)%8 == 0: #se o proximo byte for o nono da seq RGBRGBRGB pula-se para a proxima sequencia 
 				img_bin[i] = str(img_bin[i])[:-1]+bit_letter
@@ -82,7 +84,7 @@ def hide(msg, img, length):
 				continue
 			img_bin[i] = str(img_bin[i])[:-1]+bit_letter
 
-	for b_terminador in '00000011': #inserindo byte de terminacao 3, endoftext na tabela ascii
+	for b_terminador in '11000000': #inserindo byte de terminacao 3, endoftext na tabela ascii
 		i += 1
 		if (i+1)%8 == 0:
 			img_bin[i] = str(img_bin[i])[:-1]+b_terminador
@@ -102,16 +104,21 @@ def show(img):
 	byte = str()
 	message = str()
 	for i in range(len(img_bin)):
+		byte = list()
 		for b in range(8):#caminha 8 bits em busca do terminador e da letra
 			if(x % 8 == 0) and (x!= 0):
 				x += 1
-			byte += str(img_bin[x])[-1]
+			byte.append(str(img_bin[x])[-1])
 			x += 1
 
-		if byte == "00000011": 
+
+		byte.reverse()
+		byte_str = ''.join(byte)
+
+		if byte_str == "00000011": 
 			break
 		else:
-			letter = chr(int(byte,2))
+			letter = chr(int(byte_str,2))
 			message+=letter
 			byte = ""
 	return message
